@@ -172,11 +172,12 @@ model Workspace {
 }
 
 model Member {
-  id          String   @id @default(cuid())
-  workspaceId String
-  userId      String
-  role        Role     @default(VIEWER)
-  joinedAt    DateTime @default(now())
+  id            String    @id @default(cuid())
+  workspaceId   String
+  userId        String
+  role          Role      @default(VIEWER)
+  joinedAt      DateTime  @default(now())
+  lastVisitedAt DateTime?
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)

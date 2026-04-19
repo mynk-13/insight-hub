@@ -29,4 +29,6 @@ export const CacheKeys = {
   embedCache: (contentHash: string) => `embed:cache:${contentHash}`,
   gatewayHealth: (gateway: string) => `gateway:health:${gateway}`,
   sessionUser: (userId: string) => `session:user:${userId}`,
+  sessionKick: (userId: string) => `session:kick:${userId}`,
+  roleChanged: (userId: string, wsId: string) => `role-changed:${userId}:${wsId}`,
 } as const;

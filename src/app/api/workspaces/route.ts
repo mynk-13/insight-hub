@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
-import { prisma } from "@/lib/shared/db";
+import { workspaceService } from "@/lib/modules/workspace";
 import { writeAuditLog } from "@/lib/modules/auth/audit";
 
 const CreateWorkspaceSchema = z.object({
@@ -12,6 +12,14 @@ const CreateWorkspaceSchema = z.object({
     .max(48)
     .regex(/^[a-z0-9-]+$/, "Slug may only contain lowercase letters, numbers, and hyphens"),
 });
+
+export async function GET() {
+  const session = await auth();
+  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const workspaces = await workspaceService.listByUser(session.user.id);
+  return NextResponse.json(workspaces);
+}
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -31,40 +39,22 @@ export async function POST(request: Request) {
   const { name, slug } = parsed.data;
   const userId = session.user.id;
 
-  const existing = await prisma.workspace.findUnique({ where: { slug } });
-  if (existing) {
-    return NextResponse.json(
-      { error: "That workspace URL is already taken. Please choose another." },
-      { status: 409 },
-    );
+  try {
+    const workspace = await workspaceService.create(userId, { name, slug });
+    await writeAuditLog({
+      action: "WORKSPACE_CREATED",
+      userId,
+      workspaceId: workspace.id,
+      metadata: { name, slug },
+    });
+    return NextResponse.json({ id: workspace.id, slug: workspace.slug }, { status: 201 });
+  } catch (err) {
+    if (err instanceof Error && err.message === "SLUG_TAKEN") {
+      return NextResponse.json(
+        { error: "That workspace URL is already taken. Please choose another." },
+        { status: 409 },
+      );
+    }
+    throw err;
   }
-
-  const workspace = await prisma.$transaction(async (tx) => {
-    const ws = await tx.workspace.create({
-      data: { name, slug, ownerId: userId, tier: "FREE" },
-    });
-    await tx.member.create({
-      data: { workspaceId: ws.id, userId, role: "OWNER" },
-    });
-    // Create default "Inbox" collection
-    await tx.collection.create({
-      data: {
-        workspaceId: ws.id,
-        name: "Inbox",
-        isPinned: true,
-        sortOrder: 0,
-        createdById: userId,
-      },
-    });
-    return ws;
-  });
-
-  await writeAuditLog({
-    action: "WORKSPACE_CREATED",
-    userId,
-    workspaceId: workspace.id,
-    metadata: { name, slug },
-  });
-
-  return NextResponse.json({ id: workspace.id, slug: workspace.slug }, { status: 201 });
 }
