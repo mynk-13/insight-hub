@@ -4,7 +4,9 @@ import { Resend } from "resend";
 import { canPerform } from "./permission";
 import type { Role } from "@prisma/client";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY);
+}
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 const FROM = "InsightHub <onboarding@resend.dev>";
@@ -53,7 +55,7 @@ export class InvitationService {
 
     const acceptUrl = `${APP_URL}/invitations/${invitation.token}`;
 
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM,
       to: email,
       subject: `You've been invited to ${workspace.name} on InsightHub`,
@@ -237,7 +239,7 @@ export class InvitationService {
 
     const acceptUrl = `${APP_URL}/invitations/${invitation.token}`;
 
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM,
       to: targetUser.email,
       subject: `Ownership of ${workspace.name} is being transferred to you`,

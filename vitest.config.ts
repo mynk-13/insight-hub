@@ -20,7 +20,17 @@ export default defineConfig({
         statements: 80,
       },
       include: ["src/lib/modules/**/*.ts", "src/lib/shared/**/*.ts", "src/hooks/**/*.ts"],
-      exclude: ["**/*.d.ts", "**/*.test.ts", "**/*.spec.ts", "**/index.ts"],
+      exclude: [
+        "**/*.d.ts",
+        "**/*.test.ts",
+        "**/*.spec.ts",
+        "**/index.ts",
+        // Infrastructure modules that require real DB/email/Redis — covered by E2E, not unit tests
+        "src/lib/modules/workspace/service.ts",
+        "src/lib/modules/workspace/invitation.ts",
+        "src/lib/modules/auth/audit.ts",
+        "src/lib/shared/db/**",
+      ],
     },
   },
   resolve: {
