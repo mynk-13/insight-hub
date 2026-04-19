@@ -1,5 +1,4 @@
-// Redis cache client stub — wired to Upstash in Phase 4
-// This module provides the interface; concrete implementation follows REQ-08
+import { Redis } from "@upstash/redis";
 
 export interface CacheClient {
   get<T>(key: string): Promise<T | null>;
@@ -8,21 +7,44 @@ export interface CacheClient {
   exists(key: string): Promise<boolean>;
 }
 
-// Placeholder no-op cache used before Upstash is wired (Phase 4)
-class NoopCache implements CacheClient {
-  async get<T>(_key: string): Promise<T | null> {
-    return null;
+// Singleton Redis client — shared by cache, queue, and idempotency modules.
+// @upstash/redis is HTTP-based and edge-compatible; no TCP connection at construction time.
+export const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL ?? "http://localhost",
+  token: process.env.UPSTASH_REDIS_REST_TOKEN ?? "",
+});
+
+class UpstashCache implements CacheClient {
+  constructor(private readonly client: Redis) {}
+
+  async get<T>(key: string): Promise<T | null> {
+    return this.client.get<T>(key);
   }
-  async set<T>(_key: string, _value: T, _ttlSeconds?: number): Promise<void> {}
-  async del(_key: string): Promise<void> {}
-  async exists(_key: string): Promise<boolean> {
-    return false;
+
+  async set<T>(key: string, value: T, ttlSeconds?: number): Promise<void> {
+    if (ttlSeconds) {
+      await this.client.set(key, value as Parameters<typeof this.client.set>[1], {
+        ex: ttlSeconds,
+      });
+    } else {
+      await this.client.set(key, value as Parameters<typeof this.client.set>[1]);
+    }
+  }
+
+  async del(key: string): Promise<void> {
+    await this.client.del(key);
+  }
+
+  async exists(key: string): Promise<boolean> {
+    const count = await this.client.exists(key);
+    return count > 0;
   }
 }
 
-export const cache: CacheClient = new NoopCache();
+export const cache: CacheClient = new UpstashCache(redis);
 
-// Cache key schema — prevents collisions across modules
+// Cache key schema — single source of truth for all Redis key patterns.
+// Changing a key here changes it everywhere; grep CacheKeys to find all usages.
 export const CacheKeys = {
   workspaceMeta: (wsId: string) => `ws:meta:${wsId}`,
   rateLimit: (identifier: string) => `ratelimit:${identifier}`,
@@ -31,4 +53,6 @@ export const CacheKeys = {
   sessionUser: (userId: string) => `session:user:${userId}`,
   sessionKick: (userId: string) => `session:kick:${userId}`,
   roleChanged: (userId: string, wsId: string) => `role-changed:${userId}:${wsId}`,
+  idempotency: (key: string) => `idempotency:${key}`,
+  jobQueue: (queueName: string) => `queue:${queueName}`,
 } as const;

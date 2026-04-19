@@ -1,11 +1,18 @@
 import NextAuth from "next-auth";
+import { Redis } from "@upstash/redis";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { authConfig } from "@/auth.config";
 
 const { auth } = NextAuth(authConfig);
 
-// Routes that don't require authentication
+// Inline Redis client — edge-compatible HTTP client, no TCP connection.
+// Kept separate from src/lib/shared/cache to avoid bundling server-only modules.
+const kickRedis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL ?? "http://localhost",
+  token: process.env.UPSTASH_REDIS_REST_TOKEN ?? "",
+});
+
 const PUBLIC_PATHS = new Set([
   "/",
   "/pricing",
@@ -34,14 +41,28 @@ export default auth(async function middleware(req: NextRequest & { auth: unknown
     return NextResponse.redirect(signIn);
   }
 
+  // Session kick: force sign-out when a member's role is changed or they're removed.
+  // The WorkspaceService sets session:kick:{userId} in Redis; we consume it here once.
+  if (session?.user?.id) {
+    const kickKey = `session:kick:${session.user.id}`;
+    const kicked = await kickRedis.get(kickKey);
+    if (kicked) {
+      await kickRedis.del(kickKey);
+      const signIn = new URL("/auth/signin", req.url);
+      const response = NextResponse.redirect(signIn);
+      // Clear the Auth.js session cookie so the user is fully signed out
+      response.cookies.delete("authjs.session-token");
+      response.cookies.delete("__Secure-authjs.session-token");
+      return response;
+    }
+  }
+
   const response = NextResponse.next();
 
-  // Inject user ID into request headers for server components and API routes
   if (session?.user?.id) {
     response.headers.set("x-user-id", session.user.id);
   }
 
-  // Extract workspace slug from /ws/[slug] routes and inject for downstream use
   const wsMatch = pathname.match(/^\/ws\/([^/]+)/);
   if (wsMatch?.[1]) {
     response.headers.set("x-workspace-slug", wsMatch[1]);

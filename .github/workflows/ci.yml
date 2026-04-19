@@ -62,6 +62,8 @@ jobs:
       DATABASE_URL_UNPOOLED: postgresql://ci:ci@localhost:5432/ci
       AUTH_SECRET: ci-build-only-32-char-placeholder-xx
       NEXT_PUBLIC_APP_URL: https://localhost:3000
+      UPSTASH_REDIS_REST_URL: https://ci-redis.upstash.io
+      UPSTASH_REDIS_REST_TOKEN: ci-token-placeholder
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
