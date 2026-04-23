@@ -54,7 +54,7 @@ export function WorkspaceNav({ workspace, userId: _userId }: Props) {
               href={item.href}
               className={cn(
                 "flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors",
-                pathname === item.href
+                pathname === item.href || pathname.startsWith(item.href + "/")
                   ? "bg-primary/10 text-primary font-medium"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground",
               )}

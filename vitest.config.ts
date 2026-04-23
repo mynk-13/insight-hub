@@ -39,6 +39,14 @@ export default defineConfig({
         "src/lib/modules/ingestion/extractors/docx.ts",
         "src/lib/modules/ingestion/extractors/pdf.ts",
         "src/lib/modules/ingestion/extractors/url.ts",
+        // RAG modules requiring real Pinecone/OpenAI/Upstash/AI-SDK — covered by E2E
+        "src/lib/modules/rag/retriever.ts",
+        "src/lib/modules/rag/rate-limiter.ts",
+        "src/lib/modules/rag/models.ts",
+        "src/lib/modules/rag/types.ts",
+        "src/lib/shared/embeddings/index.ts",
+        // Client hook — not unit-testable in jsdom without full browser streaming API
+        "src/hooks/**",
       ],
     },
   },
