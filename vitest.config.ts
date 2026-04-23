@@ -25,11 +25,20 @@ export default defineConfig({
         "**/*.test.ts",
         "**/*.spec.ts",
         "**/index.ts",
-        // Infrastructure modules that require real DB/email/Redis — covered by E2E, not unit tests
+        // Infrastructure modules that require real DB/email/Redis/external APIs — covered by E2E, not unit tests
         "src/lib/modules/workspace/service.ts",
         "src/lib/modules/workspace/invitation.ts",
         "src/lib/modules/auth/audit.ts",
         "src/lib/shared/db/**",
+        // Ingestion modules that require real OpenAI/Pinecone/Tesseract/HTTP — covered by E2E
+        "src/lib/modules/ingestion/embedder.ts",
+        "src/lib/modules/ingestion/indexer.ts",
+        "src/lib/modules/ingestion/pipeline.ts",
+        "src/lib/modules/ingestion/quota.ts",
+        "src/lib/modules/ingestion/types.ts",
+        "src/lib/modules/ingestion/extractors/docx.ts",
+        "src/lib/modules/ingestion/extractors/pdf.ts",
+        "src/lib/modules/ingestion/extractors/url.ts",
       ],
     },
   },

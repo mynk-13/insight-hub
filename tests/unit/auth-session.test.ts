@@ -59,4 +59,13 @@ describe("sessionJwt — dual HMAC key rotation", () => {
     const result = await sessionJwt.decode({ token: ENCODED, secret: "", salt: "test" });
     expect(result).toBeNull();
   });
+
+  it("encode falls back to AUTH_SECRET when AUTH_SECRET_CURRENT is unset", async () => {
+    delete process.env.AUTH_SECRET_CURRENT;
+    process.env.AUTH_SECRET = "fallback-secret";
+    vi.mocked(mockEncode).mockResolvedValue(ENCODED);
+    await sessionJwt.encode({ token: MOCK_TOKEN, secret: "", salt: "test" });
+    expect(mockEncode).toHaveBeenCalledWith(expect.objectContaining({ secret: "fallback-secret" }));
+    delete process.env.AUTH_SECRET;
+  });
 });

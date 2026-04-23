@@ -53,4 +53,13 @@ describe("chunkText", () => {
       expect(chunk.content.trim().length).toBeGreaterThan(0);
     }
   });
+
+  it("assigns pageNumber when pageCount > 1 is provided", async () => {
+    const chunks = await chunkText(SAMPLE_TEXT, "src-1", "ws-1", 10);
+    const withPage = chunks.filter((c) => c.pageNumber !== undefined);
+    expect(withPage.length).toBeGreaterThan(0);
+    for (const chunk of withPage) {
+      expect(chunk.pageNumber).toBeGreaterThanOrEqual(1);
+    }
+  });
 });
