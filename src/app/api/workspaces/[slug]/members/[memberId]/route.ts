@@ -3,6 +3,8 @@ import { z } from "zod";
 import { auth } from "@/auth";
 import { workspaceService } from "@/lib/modules/workspace";
 import { writeAuditLog } from "@/lib/modules/auth/audit";
+import { NotificationService, sendRoleChangedEmail } from "@/lib/modules/annotations";
+import { db } from "@/lib/shared/db";
 import { Role } from "@prisma/client";
 
 const PatchSchema = z.object({
@@ -38,6 +40,24 @@ export async function PATCH(req: Request, { params }: Params) {
       workspaceId: workspace.id,
       metadata: { memberId, newRole: parsed.data.role },
     });
+
+    // Fire-and-forget: in-app + email notification
+    const targetMember = await db.member.findUnique({
+      where: { id: memberId },
+      select: { userId: true, user: { select: { email: true } } },
+    });
+    if (targetMember && targetMember.userId !== session.user.id) {
+      void NotificationService.create(targetMember.userId, workspace.id, "ROLE_CHANGED", {
+        title: `Your role in ${workspace.name} was changed to ${parsed.data.role}`,
+      });
+      void sendRoleChangedEmail(
+        targetMember.user.email,
+        targetMember.userId,
+        workspace.name,
+        parsed.data.role,
+      );
+    }
+
     return new NextResponse(null, { status: 204 });
   } catch (err) {
     if (err instanceof Error) {

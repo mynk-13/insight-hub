@@ -52,6 +52,10 @@ export default defineConfig({
         "src/lib/modules/search/history.ts",
         // Collection service requiring real DB — covered by E2E
         "src/lib/modules/workspace/collection.ts",
+        // Annotation modules requiring real DB/Resend — covered by E2E
+        "src/lib/modules/annotations/service.ts",
+        "src/lib/modules/annotations/notification-service.ts",
+        "src/lib/modules/annotations/email.ts",
       ],
     },
   },

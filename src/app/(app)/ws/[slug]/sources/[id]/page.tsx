@@ -5,6 +5,7 @@ import { db } from "@/lib/shared/db";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
+import { AnnotationRailWrapper } from "@/components/features/annotations/annotation-rail-wrapper";
 
 interface PageProps {
   params: Promise<{ slug: string; id: string }>;
@@ -47,7 +48,7 @@ async function SourceReaderContent({
   if (!source) notFound();
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
+    <div className="mx-auto max-w-5xl px-4 py-8">
       {/* Header */}
       <div className="mb-6 space-y-3">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -89,62 +90,14 @@ async function SourceReaderContent({
 
       <Separator className="mb-6" />
 
-      {/* Content / Chunk Preview */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
-        <div className="space-y-4">
-          <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-            Content Preview
-          </h2>
-          {source.status !== "INDEXED" ? (
-            <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
-              {source.status === "FAILED"
-                ? "Ingestion failed. Please delete and re-upload this source."
-                : "This source is still being processed. Check back shortly."}
-            </div>
-          ) : source.chunks.length === 0 ? (
-            <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
-              No chunks found.
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {source.chunks.map((chunk: (typeof source.chunks)[number]) => (
-                <div
-                  key={chunk.id}
-                  className="rounded-lg border bg-muted/30 px-4 py-3 text-sm leading-relaxed"
-                >
-                  <div className="mb-1 flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground font-mono">
-                      #{chunk.chunkIndex + 1}
-                    </span>
-                    {chunk.pageNumber && (
-                      <span className="text-xs text-muted-foreground">p.{chunk.pageNumber}</span>
-                    )}
-                    <span className="text-xs text-muted-foreground ml-auto">
-                      {chunk.tokenCount} tokens
-                    </span>
-                  </div>
-                  <p className="line-clamp-4">{chunk.content}</p>
-                </div>
-              ))}
-              {source._count.chunks > 20 && (
-                <p className="text-xs text-muted-foreground text-center">
-                  Showing 20 of {source._count.chunks} chunks
-                </p>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Annotations rail (placeholder) */}
-        <aside className="space-y-4">
-          <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-            Annotations
-          </h2>
-          <div className="rounded-lg border border-dashed p-6 text-center text-xs text-muted-foreground">
-            Annotations will appear here once you highlight text in a source.
-          </div>
-        </aside>
-      </div>
+      {/* Content + Annotation Rail */}
+      <AnnotationRailWrapper
+        sourceId={id}
+        workspaceSlug={slug}
+        currentUserId={session.user.id}
+        currentUserRole={member.role}
+        source={source}
+      />
     </div>
   );
 }

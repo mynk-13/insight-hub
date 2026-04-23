@@ -10,6 +10,7 @@ import type { WorkspaceWithRole } from "@/lib/modules/workspace/service";
 import type { CollectionWithCount } from "@/lib/modules/workspace/collection";
 import { canPerform } from "@/lib/modules/workspace/permission";
 import { Settings, Users, BookOpen, MessageSquare, BarChart2, FolderOpen } from "lucide-react";
+import { NotificationBell } from "@/components/features/notifications/notification-bell";
 
 type Props = {
   workspace: WorkspaceWithRole;
@@ -47,8 +48,9 @@ export function WorkspaceNav({ workspace, userId: _userId, pinnedCollections = [
 
   return (
     <aside className="w-56 border-r bg-muted/30 flex flex-col py-4 gap-1 shrink-0">
-      <div className="px-3 mb-2">
+      <div className="px-3 mb-2 flex items-center justify-between">
         <WorkspaceSwitcher currentSlug={workspace.slug} currentName={workspace.name} />
+        <NotificationBell workspaceSlug={workspace.slug} />
       </div>
 
       {/* Search trigger */}
