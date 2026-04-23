@@ -55,4 +55,5 @@ export const CacheKeys = {
   roleChanged: (userId: string, wsId: string) => `role-changed:${userId}:${wsId}`,
   idempotency: (key: string) => `idempotency:${key}`,
   jobQueue: (queueName: string) => `queue:${queueName}`,
+  searchHistory: (userId: string, wsId: string) => `search:history:${userId}:${wsId}`,
 } as const;

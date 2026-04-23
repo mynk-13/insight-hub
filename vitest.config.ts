@@ -47,6 +47,11 @@ export default defineConfig({
         "src/lib/shared/embeddings/index.ts",
         // Client hook — not unit-testable in jsdom without full browser streaming API
         "src/hooks/**",
+        // Search modules requiring real Pinecone/OpenAI/Upstash — covered by E2E
+        "src/lib/modules/search/searcher.ts",
+        "src/lib/modules/search/history.ts",
+        // Collection service requiring real DB — covered by E2E
+        "src/lib/modules/workspace/collection.ts",
       ],
     },
   },

@@ -4,22 +4,27 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { WorkspaceSwitcher } from "./workspace-switcher";
+import { CollectionsSidebar } from "./collections-sidebar";
+import { SearchPalette } from "@/components/features/search/search-palette";
 import type { WorkspaceWithRole } from "@/lib/modules/workspace/service";
+import type { CollectionWithCount } from "@/lib/modules/workspace/collection";
 import { canPerform } from "@/lib/modules/workspace/permission";
-import { Settings, Users, BookOpen, MessageSquare, BarChart2 } from "lucide-react";
+import { Settings, Users, BookOpen, MessageSquare, BarChart2, FolderOpen } from "lucide-react";
 
 type Props = {
   workspace: WorkspaceWithRole;
   userId: string;
+  pinnedCollections?: CollectionWithCount[];
 };
 
-export function WorkspaceNav({ workspace, userId: _userId }: Props) {
+export function WorkspaceNav({ workspace, userId: _userId, pinnedCollections = [] }: Props) {
   const pathname = usePathname();
   const base = `/ws/${workspace.slug}`;
 
   const navItems = [
     { href: `${base}/library`, label: "Library", icon: BookOpen, always: true },
     { href: `${base}/chat`, label: "Chat", icon: MessageSquare, always: true },
+    { href: `${base}/collections`, label: "Collections", icon: FolderOpen, always: true },
     {
       href: `${base}/settings/members`,
       label: "Members",
@@ -45,6 +50,12 @@ export function WorkspaceNav({ workspace, userId: _userId }: Props) {
       <div className="px-3 mb-2">
         <WorkspaceSwitcher currentSlug={workspace.slug} currentName={workspace.name} />
       </div>
+
+      {/* Search trigger */}
+      <div className="px-3 mb-1">
+        <SearchPalette workspaceSlug={workspace.slug} />
+      </div>
+
       <nav className="flex flex-col gap-0.5 px-2">
         {navItems
           .filter((item) => item.always || item.show)
@@ -64,6 +75,13 @@ export function WorkspaceNav({ workspace, userId: _userId }: Props) {
             </Link>
           ))}
       </nav>
+
+      {/* Pinned collections drag-sortable section */}
+      <CollectionsSidebar
+        collections={pinnedCollections}
+        workspaceSlug={workspace.slug}
+        canEdit={canPerform(workspace.role, "sources:upload")}
+      />
     </aside>
   );
 }

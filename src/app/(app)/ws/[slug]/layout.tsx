@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { redirect, notFound } from "next/navigation";
 import { auth } from "@/auth";
-import { workspaceService } from "@/lib/modules/workspace";
+import { workspaceService, CollectionService } from "@/lib/modules/workspace";
 import { WorkspaceNav } from "@/components/features/workspace/workspace-nav";
 
 type Props = {
@@ -19,7 +19,15 @@ async function WorkspaceSidebar({ params }: { params: Promise<{ slug: string }> 
 
   void workspaceService.touchLastVisited(workspace.id, session.user.id);
 
-  return <WorkspaceNav workspace={workspace} userId={session.user.id} />;
+  const pinnedCollections = await CollectionService.listPinned(workspace.id);
+
+  return (
+    <WorkspaceNav
+      workspace={workspace}
+      userId={session.user.id}
+      pinnedCollections={pinnedCollections}
+    />
+  );
 }
 
 export default function WorkspaceLayout({ children, params }: Props) {

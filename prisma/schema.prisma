@@ -198,6 +198,7 @@ model Source {
   sizeBytes   Int?
   contentHash String?
   status      SourceStatus @default(PENDING)
+  tags        String[]
   pageCount   Int?
   wordCount   Int?
   createdById String
