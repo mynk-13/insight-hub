@@ -49,5 +49,8 @@ export async function withCurrentWorkspace<T>(
 // Re-export only what consumers need from the workspace context
 export { runWithWorkspace, getCurrentWorkspaceId } from "./workspace-context";
 
+// Convenience alias used by feature modules
+export const db = prisma;
+
 // Suppress unused import warning — kept for future use in workspace-scoped checks
 void WORKSPACE_SCOPED;

@@ -18,7 +18,7 @@ export function WorkspaceNav({ workspace, userId: _userId }: Props) {
   const base = `/ws/${workspace.slug}`;
 
   const navItems = [
-    { href: `${base}`, label: "Library", icon: BookOpen, always: true },
+    { href: `${base}/library`, label: "Library", icon: BookOpen, always: true },
     { href: `${base}/chat`, label: "Chat", icon: MessageSquare, always: true },
     {
       href: `${base}/settings/members`,
