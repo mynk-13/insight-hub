@@ -24,6 +24,7 @@ const ALL_ACTIONS: WorkspaceAction[] = [
   "annotations:delete_any",
   "invitations:manage",
   "activity:read",
+  "billing:manage",
 ];
 
 // Expected permission matrix
@@ -46,6 +47,7 @@ const EXPECTED: Record<WorkspaceAction, Role[]> = {
   "annotations:delete_any": ["OWNER", "ADMIN"],
   "invitations:manage": ["OWNER", "ADMIN"],
   "activity:read": ["OWNER", "ADMIN", "EDITOR"],
+  "billing:manage": ["OWNER"],
 };
 
 describe("canPerform — full permission matrix", () => {

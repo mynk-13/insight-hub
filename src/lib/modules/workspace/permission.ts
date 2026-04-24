@@ -18,7 +18,8 @@ export type WorkspaceAction =
   | "annotations:delete_own"
   | "annotations:delete_any"
   | "invitations:manage"
-  | "activity:read";
+  | "activity:read"
+  | "billing:manage";
 
 // Static permission matrix — O(1) lookup, no DB hit required.
 const PERMISSION_MATRIX: Record<WorkspaceAction, ReadonlySet<Role>> = {
@@ -40,6 +41,7 @@ const PERMISSION_MATRIX: Record<WorkspaceAction, ReadonlySet<Role>> = {
   "annotations:delete_any": new Set(["OWNER", "ADMIN"]),
   "invitations:manage": new Set(["OWNER", "ADMIN"]),
   "activity:read": new Set(["OWNER", "ADMIN", "EDITOR"]),
+  "billing:manage": new Set(["OWNER"]),
 };
 
 export function canPerform(role: Role, action: WorkspaceAction): boolean {

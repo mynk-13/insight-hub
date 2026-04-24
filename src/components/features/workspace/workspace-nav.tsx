@@ -9,7 +9,15 @@ import { SearchPalette } from "@/components/features/search/search-palette";
 import type { WorkspaceWithRole } from "@/lib/modules/workspace/service";
 import type { CollectionWithCount } from "@/lib/modules/workspace/collection";
 import { canPerform } from "@/lib/modules/workspace/permission";
-import { Settings, Users, BookOpen, MessageSquare, BarChart2, FolderOpen } from "lucide-react";
+import {
+  Settings,
+  Users,
+  BookOpen,
+  MessageSquare,
+  BarChart2,
+  FolderOpen,
+  CreditCard,
+} from "lucide-react";
 import { NotificationBell } from "@/components/features/notifications/notification-bell";
 
 type Props = {
@@ -37,6 +45,12 @@ export function WorkspaceNav({ workspace, userId: _userId, pinnedCollections = [
       label: "Settings",
       icon: Settings,
       show: canPerform(workspace.role, "workspace:update"),
+    },
+    {
+      href: `${base}/settings/billing`,
+      label: "Billing",
+      icon: CreditCard,
+      show: canPerform(workspace.role, "billing:manage"),
     },
     {
       href: `${base}/analytics`,
