@@ -32,11 +32,15 @@ async function WorkspaceSidebar({ params }: { params: Promise<{ slug: string }> 
 
 export default function WorkspaceLayout({ children, params }: Props) {
   return (
-    <div className="flex min-h-screen">
-      <Suspense fallback={<aside className="w-56 border-r bg-muted/30 shrink-0 animate-pulse" />}>
+    <div className="flex min-h-screen bg-background">
+      <Suspense
+        fallback={
+          <aside className="w-60 border-r border-border/60 bg-sidebar shrink-0 animate-pulse" />
+        }
+      >
         <WorkspaceSidebar params={params} />
       </Suspense>
-      <main className="flex-1 overflow-auto">{children}</main>
+      <main className="flex-1 overflow-auto bg-background">{children}</main>
     </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { Bell } from "lucide-react";
 import type { NotificationType } from "@prisma/client";
 
 interface NotificationItem {
@@ -41,7 +42,6 @@ export function NotificationBell({ workspaceSlug }: NotificationBellProps) {
   const [unreadCount, setUnreadCount] = useState(0);
   const panelRef = useRef<HTMLDivElement>(null);
 
-  // Initial load on mount
   useEffect(() => {
     fetch(`/api/notifications?workspace=${workspaceSlug}`)
       .then((r) => r.json())
@@ -52,7 +52,6 @@ export function NotificationBell({ workspaceSlug }: NotificationBellProps) {
       .catch(() => {});
   }, [workspaceSlug]);
 
-  // Poll every 30s when panel is closed
   useEffect(() => {
     if (open) return;
     const id = setInterval(() => {
@@ -94,29 +93,35 @@ export function NotificationBell({ workspaceSlug }: NotificationBellProps) {
 
   return (
     <div className="relative" ref={panelRef}>
+      {/* Full-width row button matching sidebar nav item style */}
       <button
         type="button"
         onClick={() => (open ? setOpen(false) : openPanel())}
-        className="relative flex items-center justify-center w-8 h-8 rounded-md hover:bg-accent text-muted-foreground hover:text-foreground"
+        className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
         aria-label="Notifications"
       >
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-          <path d="M8 1a5.5 5.5 0 0 0-5.5 5.5v2.836l-.832 1.386A.5.5 0 0 0 2.1 11.5h11.8a.5.5 0 0 0 .432-.778L13.5 9.336V6.5A5.5 5.5 0 0 0 8 1zM6.5 13a1.5 1.5 0 0 0 3 0H6.5z" />
-        </svg>
+        <span className="relative shrink-0">
+          <Bell className="h-4 w-4" />
+          {unreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 min-w-[14px] h-3.5 bg-primary text-primary-foreground text-[9px] font-bold rounded-full flex items-center justify-center px-0.5 leading-none">
+              {unreadCount > 99 ? "99+" : unreadCount}
+            </span>
+          )}
+        </span>
+        <span>Notifications</span>
         {unreadCount > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full flex items-center justify-center px-0.5">
-            {unreadCount > 99 ? "99+" : unreadCount}
-          </span>
+          <span className="ml-auto text-[10px] font-semibold text-primary">{unreadCount}</span>
         )}
       </button>
 
+      {/* Panel opens upward and to the right of the sidebar */}
       {open && (
-        <div className="absolute right-0 top-10 w-80 bg-popover border border-border rounded-lg shadow-lg z-50 overflow-hidden">
-          <div className="flex items-center justify-between px-3 py-2 border-b border-border">
-            <span className="text-xs font-semibold">Notifications</span>
+        <div className="absolute left-full bottom-0 ml-2 w-80 bg-popover border border-border rounded-xl shadow-2xl z-50 overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+            <span className="text-sm font-semibold">Notifications</span>
             <Link
               href={`/ws/${workspaceSlug}/notifications/preferences`}
-              className="text-xs text-muted-foreground hover:text-foreground"
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
               onClick={() => setOpen(false)}
             >
               Preferences
@@ -124,16 +129,21 @@ export function NotificationBell({ workspaceSlug }: NotificationBellProps) {
           </div>
 
           {notifications.length === 0 ? (
-            <div className="px-3 py-8 text-center text-xs text-muted-foreground">
-              No notifications yet.
+            <div className="px-4 py-10 text-center">
+              <Bell className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
+              <p className="text-sm text-muted-foreground">No notifications yet.</p>
             </div>
           ) : (
-            <ul className="max-h-80 overflow-y-auto divide-y divide-border/50">
+            <ul className="max-h-96 overflow-y-auto divide-y divide-border/50">
               {notifications.map((n) => {
                 const Inner = (
-                  <div className={`px-3 py-2.5 hover:bg-accent ${!n.isRead ? "bg-accent/30" : ""}`}>
-                    <div className="flex items-start gap-2">
-                      <span className="text-sm mt-0.5">{TYPE_ICONS[n.type]}</span>
+                  <div
+                    className={`px-4 py-3 hover:bg-accent/60 transition-colors ${
+                      !n.isRead ? "bg-primary/5" : ""
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <span className="text-sm mt-0.5 shrink-0">{TYPE_ICONS[n.type]}</span>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-medium truncate">{n.title}</p>
                         {n.body && (
@@ -141,7 +151,7 @@ export function NotificationBell({ workspaceSlug }: NotificationBellProps) {
                             {n.body}
                           </p>
                         )}
-                        <p className="text-[10px] text-muted-foreground mt-1">
+                        <p className="text-[10px] text-muted-foreground/70 mt-1">
                           {formatTime(n.createdAt)}
                         </p>
                       </div>

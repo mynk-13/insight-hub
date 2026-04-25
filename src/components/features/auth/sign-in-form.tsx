@@ -28,16 +28,22 @@ export function SignInForm({ callbackUrl = "/dashboard" }: SignInFormProps) {
     if (!email) return;
     setLoading("email");
     setError(null);
-    const res = await signIn("resend", {
-      email,
-      callbackUrl,
-      redirect: false,
-    });
-    setLoading(null);
-    if (res?.error) {
-      setError("Failed to send magic link. Please try again.");
-    } else {
-      setEmailSent(true);
+    try {
+      const res = await signIn("resend", {
+        email,
+        callbackUrl,
+        redirect: false,
+      });
+      setLoading(null);
+      // Auth.js v5: ok=false or error set means failure
+      if (res && (!res.ok || res.error)) {
+        setError("Could not send magic link — try Google or GitHub sign-in above.");
+      } else {
+        setEmailSent(true);
+      }
+    } catch {
+      setLoading(null);
+      setError("Could not send magic link — try Google or GitHub sign-in above.");
     }
   }
 
