@@ -127,7 +127,7 @@ describe("export — CSV format", () => {
 
 describe("export — purge validation", () => {
   it("confirmation must match workspace slug exactly", () => {
-    const slug = "my-workspace";
+    const slug: string = "my-workspace";
     expect(slug === "my-workspace").toBe(true);
     expect(slug === "My-Workspace").toBe(false);
     expect(slug === "my workspace").toBe(false);
