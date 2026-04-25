@@ -97,6 +97,9 @@ export function SignInForm({ callbackUrl = "/dashboard" }: SignInFormProps) {
             required
             disabled={!!loading}
           />
+          <p className="text-xs text-muted-foreground">
+            Magic link is in limited beta. <strong>Google or GitHub sign-in is recommended.</strong>
+          </p>
         </div>
         {error && <p className="text-xs text-destructive">{error}</p>}
         <Button type="submit" className="w-full" disabled={!!loading}>
