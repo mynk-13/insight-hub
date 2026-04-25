@@ -36,7 +36,7 @@ async function SignInContent({ searchParams }: SignInPageProps) {
         </p>
       )}
 
-      <SignInForm callbackUrl={callbackUrl ?? "/"} />
+      <SignInForm callbackUrl={callbackUrl ?? "/dashboard"} />
 
       <p className="text-center text-xs text-muted-foreground">
         By signing in you agree to our{" "}

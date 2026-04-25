@@ -61,14 +61,14 @@
     height: 100%;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    @apply font-sans;
+    font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   }
 
   body {
     min-height: 100%;
     background-color: var(--color-surface);
     color: var(--color-text-primary);
-    font-family: var(--font-sans);
+    font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
     @apply bg-background text-foreground;
   }
 

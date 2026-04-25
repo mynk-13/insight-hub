@@ -11,7 +11,7 @@ interface SignInFormProps {
   callbackUrl?: string;
 }
 
-export function SignInForm({ callbackUrl = "/" }: SignInFormProps) {
+export function SignInForm({ callbackUrl = "/dashboard" }: SignInFormProps) {
   const [email, setEmail] = useState("");
   const [emailSent, setEmailSent] = useState(false);
   const [loading, setLoading] = useState<string | null>(null);
