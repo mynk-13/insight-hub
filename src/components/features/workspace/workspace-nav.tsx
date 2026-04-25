@@ -17,6 +17,8 @@ import {
   BarChart2,
   FolderOpen,
   CreditCard,
+  Download,
+  ScrollText,
 } from "lucide-react";
 import { NotificationBell } from "@/components/features/notifications/notification-bell";
 
@@ -57,6 +59,18 @@ export function WorkspaceNav({ workspace, userId: _userId, pinnedCollections = [
       label: "Analytics",
       icon: BarChart2,
       show: canPerform(workspace.role, "analytics:read"),
+    },
+    {
+      href: `${base}/settings/audit-logs`,
+      label: "Audit Log",
+      icon: ScrollText,
+      show: canPerform(workspace.role, "analytics:read"),
+    },
+    {
+      href: `${base}/settings/export`,
+      label: "Export & Data",
+      icon: Download,
+      show: canPerform(workspace.role, "workspace:read"),
     },
   ];
 

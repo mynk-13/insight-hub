@@ -56,4 +56,5 @@ export const CacheKeys = {
   idempotency: (key: string) => `idempotency:${key}`,
   jobQueue: (queueName: string) => `queue:${queueName}`,
   searchHistory: (userId: string, wsId: string) => `search:history:${userId}:${wsId}`,
+  analytics: (wsId: string) => `analytics:${wsId}`,
 } as const;

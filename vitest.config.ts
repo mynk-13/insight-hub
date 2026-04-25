@@ -10,6 +10,7 @@ export default defineConfig({
     include: ["tests/unit/**/*.test.ts"],
     exclude: ["tests/e2e/**"],
     setupFiles: ["./tests/unit/setup.ts"],
+    maxWorkers: 4,
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],
@@ -65,6 +66,12 @@ export default defineConfig({
         "src/lib/modules/billing/subscription.ts",
         "src/lib/modules/billing/metering.ts",
         "src/lib/modules/billing/types.ts",
+        // Analytics aggregator requires real DB/Redis — covered by E2E
+        "src/lib/modules/analytics/aggregator.ts",
+        // Export modules require real DB/Pinecone/Blob/Redis — covered by E2E
+        "src/lib/modules/export/workspace-exporter.ts",
+        "src/lib/modules/export/purge.ts",
+        "src/lib/modules/export/types.ts",
       ],
     },
   },

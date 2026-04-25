@@ -20,6 +20,7 @@ export interface IngestionJobPayload {
 }
 
 export interface ExportJobPayload {
+  jobId: string;
   workspaceId: string;
   userId: string;
   format: "zip" | "md" | "notion";
